@@ -1,0 +1,12 @@
+L'application contient deux comptes bancaires (BankAccount) et trois opérations éffectuées pour chaque compte bancaires.
+Trois api sont mis en évidences :
+
+1. PUT /api/accounts/{accountId}/deposit (pour créditer un compte)
+
+2. PUT /api/accounts/{accountId}/withdrawal (pour débiter un compte)
+
+3. GET /api/accounts/{accountId}/history  (pour l'historique des transactions effectuées pour chaque compte)
+
+NB : valeurs possibles de accountId {1,2}
+
+URL swagger :  http://localhost:8080/swagger-ui.html#/
