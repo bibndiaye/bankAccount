@@ -1,4 +1,4 @@
-package com.mndiaye.bank.bankaccount.service;
+package com.mndiaye.bank.bankaccount.mapper;
 
 import com.mndiaye.bank.bankaccount.domaine.BankAccount;
 import com.mndiaye.bank.bankaccount.domaine.Operation;

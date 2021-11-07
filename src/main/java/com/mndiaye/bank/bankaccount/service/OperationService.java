@@ -2,9 +2,9 @@ package com.mndiaye.bank.bankaccount.service;
 
 import com.mndiaye.bank.bankaccount.domaine.BankAccount;
 import com.mndiaye.bank.bankaccount.domaine.Operation;
-import com.mndiaye.bank.bankaccount.domaine.OperationType;
+import com.mndiaye.bank.bankaccount.enums.OperationType;
 import com.mndiaye.bank.bankaccount.domaine.dto.AccountDto;
-import com.mndiaye.bank.bankaccount.repo.PopulateBank;
+import com.mndiaye.bank.bankaccount.mapper.AccountDtoMapper;
 import com.mndiaye.bank.bankaccount.utils.NoSuchAccountException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -88,7 +89,7 @@ public class OperationService {
      * @throws NoSuchAccountException
      */
 
-    Operation createAndPerformOperation(int accountId, long amount, OperationType operationType) throws NoSuchAccountException {
+    public  Operation createAndPerformOperation(int accountId, long amount, OperationType operationType) throws NoSuchAccountException {
         BankAccount account = createbankAccounts(operations()).get(accountId);
 
         int opType = operationType.equals(OperationType.WITHDRAWAL) ? -1 : 1;
@@ -112,22 +113,34 @@ public class OperationService {
      * @return all operations on a given account
      * @throws NoSuchAccountException
      */
-    public List<Operation> listAllOperations(int accountId) throws NoSuchAccountException {
+    public List<Operation> listAllOperations(int accountId) {
         BankAccount account = createbankAccounts(operations()).get(accountId);
 
         return account.getOperations();
     }
 
+    /**
+     *
+     * @param operations
+     * @return all operation done per account
+     */
+
     public List<BankAccount> createbankAccounts (List<Operation> operations ){
         BankAccount bankAccount;
         List<BankAccount> bankAccounts = new ArrayList<>();
+        long balance= getBanceFromAllOp(operations);
         for (int i=1; i<3; i++){
-            bankAccount = new BankAccount(i, 0, operations);
+            bankAccount = new BankAccount(i, balance, operations);
             bankAccounts.add(bankAccount);
         }
 
         return bankAccounts;
     }
+
+    /**
+     *
+     * @return all operations done per account
+     */
     public List<Operation> operations (){
         Operation operation1 = new Operation(1, LocalDateTime.now(),-400, OperationType.WITHDRAWAL);
         Operation operation2 = new Operation(2, LocalDateTime.now(),500, OperationType.DEPOSIT);
@@ -141,5 +154,22 @@ public class OperationService {
 
 
         return operations;
+    }
+
+    /**
+     *
+     * @param operations
+     * @return balance of a bank accountid
+     */
+    public long getBanceFromAllOp(List<Operation> operations) {
+        int cpt=0;
+        if ((operations==null)) return  0;
+
+        for (Operation op: operations){
+            log.info("montant = "+op.getAmount());
+            cpt+=op.getAmount();
+        }
+        log.info("cpt = "+cpt);
+        return cpt;
     }
 }

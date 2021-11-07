@@ -2,8 +2,7 @@ package com.mndiaye.bank.bankaccount.repo;
 
 import com.mndiaye.bank.bankaccount.domaine.BankAccount;
 import com.mndiaye.bank.bankaccount.domaine.Operation;
-import com.mndiaye.bank.bankaccount.domaine.OperationType;
-import org.springframework.stereotype.Service;
+import com.mndiaye.bank.bankaccount.enums.OperationType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package com.mndiaye.bank.bankaccount.domaine;
 
+import com.mndiaye.bank.bankaccount.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

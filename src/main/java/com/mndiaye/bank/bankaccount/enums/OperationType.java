@@ -1,4 +1,4 @@
-package com.mndiaye.bank.bankaccount.domaine;
+package com.mndiaye.bank.bankaccount.enums;
 
 public enum OperationType {
 
