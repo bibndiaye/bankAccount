@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
-@Slf4j
 public class BankAccountApplication {
 
 	public static void main(String[] args) {

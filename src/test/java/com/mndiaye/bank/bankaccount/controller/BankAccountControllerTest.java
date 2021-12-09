@@ -10,6 +10,7 @@ import com.mndiaye.bank.bankaccount.service.OperationService;
 import com.mndiaye.bank.bankaccount.utils.NoSuchAccountException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,15 +31,23 @@ public class BankAccountControllerTest {
     @Mock
     AccountDtoMapper mapper;
 
-    @Mock
-    AccountDto dto;
+
+    AccountDto accountDto;
+
+    List<Operation> operations ;
+    @BeforeEach
+    public void initOperations() {
+         accountDto  = new AccountDto();
+         operations = operationService.operations();
+    }
+
     /***
      *
      * @throws NoSuchAccountException
      */
     @Test
-    public void showOperationsList() throws NoSuchAccountException {
-        List<Operation> operations = operationService.listAllOperations(1);
+    public void showOperationsListTest() throws NoSuchAccountException {
+        operations = operationService.listAllOperations(1);
         Assertions.assertNotNull(operations);
         Assertions.assertEquals(3, operations.size());
     }
@@ -48,14 +57,12 @@ public class BankAccountControllerTest {
      * @throws NoSuchAccountException
      */
     @Test
-    public void deposit() throws NoSuchAccountException {
+    public void depositTest() throws NoSuchAccountException {
 
         OperationCommand operationCommand = new OperationCommand(200);
         Operation operation = operationService.createAndPerformOperation(1,operationCommand.getAmount(), OperationType.DEPOSIT);
-        List<Operation> operations = operationService.operations();
         BankAccount account = operationService.createbankAccounts(operations).get(0);
         account.getOperations().add(operation);
-        AccountDto accountDto  = new AccountDto();
         accountDto.setBalance(operationService.getBanceFromAllOp(operations));
         accountDto.setLatestOperations(operations);
         Assertions.assertNotNull(accountDto);
@@ -64,14 +71,14 @@ public class BankAccountControllerTest {
 
     }
     @Test
-    public void doWithdrawal() throws NoSuchAccountException {
+    public void withdrawalTest() throws NoSuchAccountException {
 
         OperationCommand operationCommand = new OperationCommand(50);
+        log.info("operationCommand = "+ operationCommand.getAmount());
+
         Operation operation = operationService.createAndPerformOperation(1,operationCommand.getAmount(), OperationType.WITHDRAWAL);
-        List<Operation> operations = operationService.operations();
         BankAccount account = operationService.createbankAccounts(operations).get(0);
         account.getOperations().add(operation);
-        AccountDto accountDto  = new AccountDto();
         accountDto.setBalance(operationService.getBanceFromAllOp(operations));
         accountDto.setLatestOperations(operations);
         Assertions.assertNotNull(accountDto);

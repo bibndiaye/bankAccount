@@ -30,12 +30,14 @@ public class OperationService {
      * @throws NoSuchAccountException
      */
     public AccountDto doWithdrawal(int accountId, long amount) throws NoSuchAccountException {
-            Operation operation = createAndPerformOperation(accountId,amount, OperationType.WITHDRAWAL);
+
+        Operation operation = createAndPerformOperation(accountId,amount, OperationType.WITHDRAWAL);
         BankAccount bankAccount = createbankAccounts(operations()).get(accountId);
 
         bankAccount.getOperations().add(operation);
         AccountDto accountDto = new AccountDto();
         long sum=0;
+
         for (int i = 0; i <bankAccount.getOperations().size() ; i++) {
             log.info("typeOp = "+bankAccount.getOperations().get(i).getType());
             if (bankAccount.getOperations().get(i).getType().equals(OperationType.WITHDRAWAL)){
@@ -44,7 +46,6 @@ public class OperationService {
                 sum+=bankAccount.getOperations().get(i).getAmount();
             }
         }
-        log.info("sum= "+sum);
         accountDto.setBalance(Math.abs(sum));
         bankAccount.balance=sum;
         accountDto.setLatestOperations(bankAccount.getOperations());
@@ -64,6 +65,7 @@ public class OperationService {
         bankAccount.getOperations().add(operation);
         AccountDto accountDto = new AccountDto();
         long sum=0;
+
         for (int i = 0; i <bankAccount.getOperations().size() ; i++) {
             log.info("typeOp = "+bankAccount.getOperations().get(i).getType());
             if (bankAccount.getOperations().get(i).getType().equals(OperationType.WITHDRAWAL)){
@@ -77,6 +79,7 @@ public class OperationService {
         bankAccount.balance=sum;
         accountDto.setLatestOperations(bankAccount.getOperations());
         log.info("bankAccount op size = "+bankAccount.getOperations().size());
+
         return dtoMapper.mapEntityToDto(bankAccount);
     }
 
@@ -172,4 +175,6 @@ public class OperationService {
         log.info("cpt = "+cpt);
         return cpt;
     }
+
+
 }

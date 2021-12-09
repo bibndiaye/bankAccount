@@ -21,7 +21,6 @@ public class BankAccountController {
     public BankAccountController(OperationService operationService) {
         this.operationService = operationService;
     }
-    //this.bankAccountService = bankAccountService;
 
     @ApiOperation(value = "withdrawall",notes = "perfom a withdrawal on the given account")
     @ApiResponses(value = {
@@ -52,7 +51,7 @@ public class BankAccountController {
             @ApiResponse(code = 404, message = "Bad request"),
     })
     @GetMapping("{accountId}/history")
-    public List<Operation> showOperationsList(@PathVariable int accountId) throws NoSuchAccountException {
+    public List<Operation> showOperationsList(@PathVariable int accountId)  {
         return operationService.listAllOperations(accountId);
     }
 }
