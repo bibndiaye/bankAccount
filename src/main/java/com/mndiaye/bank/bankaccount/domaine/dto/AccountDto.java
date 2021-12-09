@@ -16,6 +16,4 @@ public class AccountDto {
     private long balance;
 
     private List<Operation> latestOperations;
-
-
 }

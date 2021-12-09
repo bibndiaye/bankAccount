@@ -1,4 +1,4 @@
-package com.mndiaye.bank.bankaccount.utils;
+package com.mndiaye.bank.bankaccount.exception;
 
 public class NoSuchAccountException extends Exception {
 

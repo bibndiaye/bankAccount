@@ -4,20 +4,15 @@ import com.mndiaye.bank.bankaccount.domaine.BankAccount;
 import com.mndiaye.bank.bankaccount.domaine.Operation;
 import com.mndiaye.bank.bankaccount.domaine.dto.AccountDto;
 import com.mndiaye.bank.bankaccount.enums.OperationType;
-import com.mndiaye.bank.bankaccount.utils.NoSuchAccountException;
+import com.mndiaye.bank.bankaccount.exception.NoSuchAccountException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(classes = OperationServiceTest.class)

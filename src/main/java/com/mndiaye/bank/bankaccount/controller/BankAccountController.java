@@ -3,9 +3,8 @@ package com.mndiaye.bank.bankaccount.controller;
 import com.mndiaye.bank.bankaccount.domaine.Operation;
 import com.mndiaye.bank.bankaccount.domaine.dto.AccountDto;
 import com.mndiaye.bank.bankaccount.domaine.dto.OperationCommand;
-import com.mndiaye.bank.bankaccount.service.BankAccountService;
 import com.mndiaye.bank.bankaccount.service.OperationService;
-import com.mndiaye.bank.bankaccount.utils.NoSuchAccountException;
+import com.mndiaye.bank.bankaccount.exception.NoSuchAccountException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -22,6 +21,7 @@ public class BankAccountController {
         this.operationService = operationService;
     }
 
+    //retrieve money
     @ApiOperation(value = "withdrawall",notes = "perfom a withdrawal on the given account")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success",response = AccountDto.class),
@@ -32,6 +32,8 @@ public class BankAccountController {
                                  @RequestBody OperationCommand operationCommand) throws NoSuchAccountException {
         return operationService.doWithdrawal(accountId,operationCommand.getAmount());
     }
+
+    //deposit money
     @ApiOperation(value = "deposit",notes = "perfom a deposit on the given account")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success",response = AccountDto.class),
@@ -40,11 +42,11 @@ public class BankAccountController {
 
     @PutMapping(value = "{accountId}/deposit")
     public AccountDto deposit(@PathVariable int accountId,
-                              @RequestBody OperationCommand operationCommand) throws NoSuchAccountException {
+                              @RequestBody OperationCommand operationCommand)  {
         return operationService.doDeposit(accountId,operationCommand.getAmount());
     }
 
-
+    // check my operations
    @ApiOperation(value = "showOperationsList",notes = "lists all given account operations")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success",responseContainer = "list",response = Operation.class),

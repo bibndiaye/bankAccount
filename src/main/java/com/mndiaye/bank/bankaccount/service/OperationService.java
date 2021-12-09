@@ -5,14 +5,13 @@ import com.mndiaye.bank.bankaccount.domaine.Operation;
 import com.mndiaye.bank.bankaccount.enums.OperationType;
 import com.mndiaye.bank.bankaccount.domaine.dto.AccountDto;
 import com.mndiaye.bank.bankaccount.mapper.AccountDtoMapper;
-import com.mndiaye.bank.bankaccount.utils.NoSuchAccountException;
+import com.mndiaye.bank.bankaccount.exception.NoSuchAccountException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -23,6 +22,11 @@ public class OperationService {
 
     @Autowired
     private AccountDtoMapper dtoMapper;
+
+    @Autowired
+    BankAccountService bankAccountService;
+
+    public static final int SIZE_OPERATIONS_INIT = 3;
     /**
      * debits the specified amount on the specified account
      * @param accountId the account identifier
@@ -31,23 +35,19 @@ public class OperationService {
      */
     public AccountDto doWithdrawal(int accountId, long amount) throws NoSuchAccountException {
 
-        Operation operation = createAndPerformOperation(accountId,amount, OperationType.WITHDRAWAL);
+        OperationType operationWithDrawal = OperationType.WITHDRAWAL;
+
+        Operation operation = createAndPerformOperation(accountId,amount, operationWithDrawal);
         BankAccount bankAccount = createbankAccounts(operations()).get(accountId);
 
         bankAccount.getOperations().add(operation);
         AccountDto accountDto = new AccountDto();
-        long sum=0;
 
-        for (int i = 0; i <bankAccount.getOperations().size() ; i++) {
-            log.info("typeOp = "+bankAccount.getOperations().get(i).getType());
-            if (bankAccount.getOperations().get(i).getType().equals(OperationType.WITHDRAWAL)){
-                sum-=Math.abs(bankAccount.getOperations().get(i).getAmount());
-            }else {
-                sum+=bankAccount.getOperations().get(i).getAmount();
-            }
-        }
-        accountDto.setBalance(Math.abs(sum));
-        bankAccount.balance=sum;
+        long totalAmount= bankAccountService.getTotalAmountByOperationType(bankAccount, operationWithDrawal);
+
+
+        accountDto.setBalance(Math.abs(totalAmount));
+        bankAccount.balance=totalAmount;
         accountDto.setLatestOperations(bankAccount.getOperations());
         bankAccount.getOperations().add(operation);
         return dtoMapper.mapEntityToDto(bankAccount);
@@ -59,26 +59,19 @@ public class OperationService {
      * @param amount the amount of the transaction
      * @throws NoSuchAccountException
      */
-    public AccountDto doDeposit(int accountId, long amount) throws NoSuchAccountException {
-        Operation operation = createAndPerformOperation(accountId,amount,OperationType.DEPOSIT);
+    public AccountDto doDeposit(int accountId, long amount)  {
+
+        OperationType operationWithDeposit = OperationType.DEPOSIT;
+        Operation operation = createAndPerformOperation(accountId,amount,operationWithDeposit);
         BankAccount bankAccount = createbankAccounts(operations()).get(accountId);
         bankAccount.getOperations().add(operation);
         AccountDto accountDto = new AccountDto();
-        long sum=0;
 
-        for (int i = 0; i <bankAccount.getOperations().size() ; i++) {
-            log.info("typeOp = "+bankAccount.getOperations().get(i).getType());
-            if (bankAccount.getOperations().get(i).getType().equals(OperationType.WITHDRAWAL)){
-                sum-=Math.abs(bankAccount.getOperations().get(i).getAmount());
-            }else {
-                sum+=bankAccount.getOperations().get(i).getAmount();
-            }
-        }
-        log.info("sum= "+sum);
-        accountDto.setBalance(sum);
-        bankAccount.balance=sum;
+        long totalAmount= bankAccountService.getTotalAmountByOperationType(bankAccount, operationWithDeposit);
+
+        accountDto.setBalance(totalAmount);
+        bankAccount.balance=totalAmount;
         accountDto.setLatestOperations(bankAccount.getOperations());
-        log.info("bankAccount op size = "+bankAccount.getOperations().size());
 
         return dtoMapper.mapEntityToDto(bankAccount);
     }
@@ -92,7 +85,7 @@ public class OperationService {
      * @throws NoSuchAccountException
      */
 
-    public  Operation createAndPerformOperation(int accountId, long amount, OperationType operationType) throws NoSuchAccountException {
+    public  Operation createAndPerformOperation(int accountId, long amount, OperationType operationType) {
         BankAccount account = createbankAccounts(operations()).get(accountId);
 
         int opType = operationType.equals(OperationType.WITHDRAWAL) ? -1 : 1;
@@ -100,7 +93,6 @@ public class OperationService {
         operation.setAmount(opType*amount);
         operation.setDate(LocalDateTime.now());
         operation.setType(operationType);
-        log.info("account.getBalance()+opType*amount = {}",account.getBalance()+opType*amount);
         account.balance+=opType*amount;
         operations().add(operation);
         account.setOperations(operations());
@@ -117,9 +109,7 @@ public class OperationService {
      * @throws NoSuchAccountException
      */
     public List<Operation> listAllOperations(int accountId) {
-        BankAccount account = createbankAccounts(operations()).get(accountId);
-
-        return account.getOperations();
+        return createbankAccounts(operations()).get(accountId).getOperations();
     }
 
     /**
@@ -132,7 +122,8 @@ public class OperationService {
         BankAccount bankAccount;
         List<BankAccount> bankAccounts = new ArrayList<>();
         long balance= getBanceFromAllOp(operations);
-        for (int i=1; i<3; i++){
+
+        for (int i=1; i< SIZE_OPERATIONS_INIT; i++){
             bankAccount = new BankAccount(i, balance, operations);
             bankAccounts.add(bankAccount);
         }
@@ -145,12 +136,15 @@ public class OperationService {
      * @return all operations done per account
      */
     public List<Operation> operations (){
+
+        // init three first operations
         Operation operation1 = new Operation(1, LocalDateTime.now(),-400, OperationType.WITHDRAWAL);
         Operation operation2 = new Operation(2, LocalDateTime.now(),500, OperationType.DEPOSIT);
         Operation operation3 = new Operation(3, LocalDateTime.now(),-150, OperationType.WITHDRAWAL);
 
 
         List<Operation> operations = new ArrayList<>();
+
         operations.add(operation1);
         operations.add(operation2);
         operations.add(operation3);
@@ -165,16 +159,15 @@ public class OperationService {
      * @return balance of a bank accountid
      */
     public long getBanceFromAllOp(List<Operation> operations) {
-        int cpt=0;
+        int balance=0;
         if ((operations==null)) return  0;
 
-        for (Operation op: operations){
-            log.info("montant = "+op.getAmount());
-            cpt+=op.getAmount();
+        for (Operation operation: operations){
+            balance+=operation.getAmount();
         }
-        log.info("cpt = "+cpt);
-        return cpt;
+        return balance;
     }
+
 
 
 }
