@@ -159,7 +159,7 @@ public class OperationService {
      * @return balance of a bank accountid
      */
     public long getBanceFromAllOp(List<Operation> operations) {
-        int balance=0;
+        int balance = 0;
         if ((operations==null)) return  0;
 
         for (Operation operation: operations){
