@@ -26,7 +26,6 @@ class BankAccountApplicationTests {
 		Assertions.assertNotNull(bankAccountController);
 		Assertions.assertNotNull(operationService);
 		Assertions.assertNotNull(bankAccountService);
-
 	}
 
 }
